@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger.%method\(\):%L -%msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="rootRollingInfo" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../logs/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>../logs/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger.%method\(\):%L -%msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+	        <level>DEBUG</level>
+	        <onMatch>ACCEPT</onMatch>   
+            <onMismatch>DENY</onMismatch>   
+        </filter>
+    </appender>
+    
+    <appender name="rootRollingError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../logs/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>../logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger.%method\(\):%L -%msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter"> 
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>   
+            <onMismatch>DENY</onMismatch>   
+        </filter>
+    </appender>
+    
+    <logger name="org.springframework" level="error" />
+    <logger name="org.apache" level="error" />
+    <logger name="org.mybatis" level="debug" />
+    <logger name="com.cbecs" level="info" />
+
+    <root level="all">
+        <appender-ref ref="console" />
+        <!-- 
+        <appender-ref ref="rootRollingError" />
+        <appender-ref ref="rootRollingInfo" />
+         -->
+    </root>
+
+</configuration>  

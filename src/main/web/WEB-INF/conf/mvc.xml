@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:cache="http://www.springframework.org/schema/cache" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd 
+    http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+	<!-- <import resource="shiro.xml" /> -->
+	<context:component-scan base-package="com.cbecs" />
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<array>
+				<value>/WEB-INF/conf/smc.properties</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="springContextHolder" class="com.cbecs.framework.spring.SpringContextHolder" />
+
+	<bean id="authFilter" class="com.cbecs.framework.web.session.filter.CookieAuthenticationFilter" />
+
+	<bean id="sessionRepertory" class="com.cbecs.framework.web.session.SessionRepertory">
+		<property name="authUrl" value="${cookie.authUrl}"></property>
+		<property name="apiLoginUrl" value="/api/invoices/signin"></property>
+		<property name="authAcl">
+			<list>
+				<value>/channels/index,GET</value>
+				<value>/submit/success,GET</value>
+				<value>/submit/error,GET</value>
+				<value>/submit/info,GET</value>
+				<value>/static/js/logging/tracker.js,GET</value>
+				<value>/pageView/new,POST</value>
+				<value>/actionView/new,POST</value>
+				<value>/invoice-scanning-applications,GET</value>
+				<value>/orders/invoice-collection,GET</value>
+				<value>/orders/order-contract-invoice,GET</value>
+				<value>/invoice-scanning-applications/add,GET</value>
+				<value>/invoice-scanning-applications,POST</value>
+				<value>/invoice-scanning-applications,GET</value>
+				<value>/invoice-scanning-applications,GET</value>
+				<value>/invoice-scanning-applications/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12},DELETE</value>
+				<value>/invoice-scanning-applications/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}/edit,GET</value>
+				<value>/invoice-scanning-applications/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}/edit-data,GET</value>
+				<value>/invoice-scanning-applications,PUT</value>
+				<value>/invoice-scanning-applications/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}/detail,GET</value>
+				<value>/invoice-scanning-applications/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}/check-detail,GET</value>
+				<value>/invoice-scanning-applications/invoice-comparation-detail,GET</value>
+				<value>/invoice-management-applications,GET</value>
+				<value>/invoice-management-applications/red,GET</value>
+				<value>/invoice-management-applications/status,GET</value>
+				<value>/invoice-management-applications/invoice-list,GET</value>
+				<value>/invoice-management-applications/invoice-detail,GET</value>
+				<value>/invoice-management-applications/[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}/detail,GET</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="locations"> <array> <value>/WEB-INF/conf/proxool.properties</value> <value>/WEB-INF/conf/security.properties</value> </array> </property> </bean> -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<!-- <property name="basenames"> <array> <value>/static/js/locale/framework</value> </array> </property> -->
+		<property name="basename" value="/static/js/locale/framework" />
+		<property name="cacheSeconds" value="86400" />
+		<property name="useCodeAsDefaultMessage" value="true" />
+	</bean>
+
+	<!-- <bean class="org.springframework.session.config.annotation.web.http.SpringHttpSessionConfiguration" /> <bean class="org.springframework.session.MapSessionRepository"> <property name="defaultMaxInactiveInterval" value="120" /> </bean> -->
+
+	<!-- <bean class="com.cbecs.framework.session.web.filters.AuthenticationFilter"> <constructor-arg name="loginUri" value="/login" /> </bean> <bean class="com.cbecs.framework.security.web.session.core.HttpSessionEventPublisher"/> <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration"> <property name="maxInactiveIntervalInSeconds" value="1800" /> <property name="defaultRedisSerializer"> <bean class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" /> </property> </bean> <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy"> <property name="poolConfig" ref="jedisPoolConfig" /> <property name="hostName" value="127.0.0.1" /> <property name="port" value="6379" /> <property name="timeout" value="5000" /> <property name="usePool" value="true" /> </bean> <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig"> <property 
+		name="maxTotal" value="64" /> <property name="maxIdle" value="4" /> <property name="numTestsPerEvictionRun" value="4" /> <property name="timeBetweenEvictionRunsMillis" value="30000" /> <property name="minEvictableIdleTimeMillis" value="-1" /> <property name="softMinEvictableIdleTimeMillis" value="10000" /> <property name="maxWaitMillis" value="1500" /> <property name="testOnBorrow" value="true" /> <property name="testWhileIdle" value="true" /> <property name="testOnReturn" value="false" /> <property name="jmxEnabled" value="true" /> <property name="jmxNamePrefix" value="aoto" /> <property name="blockWhenExhausted" value="false" /> </bean> <bean class="org.springframework.session.web.http.DefaultCookieSerializer"> <property name="cookieName" value="auth_token" /> <property name="cookiePath" value="/" /> </bean> -->
+	<!-- <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"> <property name="connectionFactory" ref="jedisConnectionFactory"></property> <property name="keySerializer"> <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" /> </property> <property name="valueSerializer"> <bean class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" /> </property> </bean> <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="locations"> <array> <value>/WEB-INF/conf/security.properties</value> </array> </property> </bean> -->
+
+	<mvc:annotation-driven />
+
+	<mvc:resources mapping="/static/**" location="/static/" cache-period="31556926" />
+	<mvc:resources mapping="/download/**" location="/download/" cache-period="31556926" />
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+	</bean>
+
+	<!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> <property name="maxUploadSize" value="1024000000" /> <property name="resolveLazily" value="true" /> <property name="maxInMemorySize" value="4096" /> <property name="defaultEncoding" value="UTF-8" /> </bean> -->
+	<!-- Changes the locale when a 'locale' request parameter is sent; e.g. /?locale=de -->
+	<!-- <mvc:interceptors> <mvc:interceptor> <mvc:mapping path="/**"/> <mvc:exclude-mapping path="/images/**"/> <mvc:exclude-mapping path="/scripts/**"/> <mvc:exclude-mapping path="/css/**"/> <mvc:exclude-mapping path="/**/*.json"/> <bean class="com.aoto.framework.security.web.interceptor.OperationLogInterceptor" /> </mvc:interceptor> <mvc:interceptor> <mvc:mapping path="/**"/> <mvc:exclude-mapping path="/images/**"/> <mvc:exclude-mapping path="/scripts/**"/> <mvc:exclude-mapping path="/css/**"/> <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" /> </mvc:interceptor> </mvc:interceptors> -->
+	<!-- Saves a locale change using a session <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"> <property name="defaultLocale" value="zh" /> </bean> <bean id="exceptionResolver" class="com.aoto.framework.web.ExceptionHandler"/> -->
+	<!-- <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"> <property name="exceptionMappings"> <props> <prop key="java.lang.Exception">errors/error</prop> <prop key="java.lang.Throwable">errors/err</prop> </props> </property> <property name="statusCodes"> <props> <prop key="errors/error">500</prop> <prop key="errors/404">404</prop> </props> </property> <property name="warnLogCategory" value="WARN"></property> <property name="defaultErrorView" value="errors/error"></property> <property name="defaultStatusCode" value="500"></property> </bean> -->
+
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> <property name="jndiName" value="java:comp/env/jdbc/sqlserver"> </property> </bean> -->
+
+	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+		<property name="poolProperties">
+			<bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
+				<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+				<property name="url" value="jdbc:sqlserver://192.168.40.160:1433;DatabaseName=maohd" />
+				<property name="username" value="maohd" />
+				<property name="password" value="ABCabc123" />
+				<property name="jmxEnabled" value="true" />
+				<property name="testWhileIdle" value="true" />
+				<property name="testOnBorrow" value="true" />
+				<property name="testOnReturn" value="false" />
+				<property name="validationInterval" value="30000" />
+				<property name="validationQuery" value="SELECT 1" />
+				<property name="timeBetweenEvictionRunsMillis" value="30000" />
+				<property name="maxActive" value="100" />
+				<property name="initialSize" value="10" />
+				<property name="maxWait" value="10000" />
+				<property name="minEvictableIdleTimeMillis" value="30000" />
+				<property name="minIdle" value="10" />
+				<property name="logAbandoned" value="false" />
+				<property name="removeAbandoned" value="true" />
+				<property name="removeAbandonedTimeout" value="60" />
+				<property name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="50" />
+		<property name="queueCapacity" value="1000" />
+		<property name="keepAliveSeconds" value="60" />
+		<property name="rejectedExecutionHandler">
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.cbecs.*.*.persistence.inf, com.cbecs.*.persistence.inf,com.cbecs.framework.web.session.persistence.inf" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="/WEB-INF/conf/mybatis.xml" />
+		<property name="plugins">
+			<list>
+				<bean class="com.cbecs.framework.mybatis.pagination.PagingInterceptor">
+					<property name="dialect">
+						<bean class="com.cbecs.framework.mybatis.pagination.dialect.SqlServerDialect" />
+					</property>
+				</bean>
+				<bean class="com.cbecs.framework.mybatis.UpdateInterceptor">
+					<property name="excepted">
+						<list>
+							<value>com.cbecs.framework.logging.persistence.inf</value>
+						</list>
+					</property>
+					<property name="taskExecutor" ref="taskExecutor" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="/WEB-INF/conf/ehcache.xml" />
+		<property name="shared" value="true" />
+	</bean>
+
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="ehcache" />
+	</bean>
+
+</beans> 

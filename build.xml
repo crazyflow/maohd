@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="smc" default="build" basedir=".">
+	<!--
+	<property environment="env" />
+	-->
+	<property name="catalina.home" value="/usr/local/tomcat" />
+
+	<property name="src.main-webapp.dir" location="${basedir}/src/main/web" />
+	<property name="src.main-java.dir" location="${basedir}/src/main/java" />
+
+	<property name="target.dir" location="${basedir}/target/" />
+	<property name="target.lib.dir" location="${target.dir}/WEB-INF/lib" />
+	<property name="target.classes.dir" location="${target.dir}/WEB-INF/classes" />
+
+	<property name="tomcat.lib.dir" value="${catalina.home}/lib" />
+	<property name="tomcat.webapps.dir" value="${catalina.home}/webapps" />
+	
+	<property name="tomcat.webapps1.dir" value="${catalina.home}/webapps1" />
+
+	<property name="src.lib.dir" location="${basedir}/src/main/web/WEB-INF/lib" />
+
+	<path id="app.classpath">
+		<fileset dir="${src.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${tomcat.lib.dir}">
+			<include name="servlet-api.jar" />
+			<include name="tomcat-jdbc.jar" />
+		</fileset>
+		<path location="${target.classes.dir}" />
+	</path>
+
+	<target name="clean.dir">
+		<delete dir="${target.dir}" />
+	</target>
+
+	<target name="create.dir" depends="clean.dir">
+		<mkdir dir="${target.dir}" />
+		<copy todir="${target.dir}">
+			<fileset dir="${src.main-webapp.dir}">
+			</fileset>
+		</copy>
+		<mkdir dir="${target.lib.dir}" />
+		<mkdir dir="${target.classes.dir}" />
+	</target>
+
+	<target name="compile.java" depends="create.dir">
+		<javac srcdir="${src.main-java.dir}" destdir="${target.classes.dir}" encoding="utf-8" debug="true" includeantruntime="true">
+			<classpath refid="app.classpath">
+			</classpath>
+		</javac>
+		<copy todir="${target.classes.dir}">
+			<fileset dir="${src.main-java.dir}">
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build" depends="compile.java">
+		<delete dir="${tomcat.webapps.dir}/smc/WEB-INF/views" />
+		<delete dir="${tomcat.webapps.dir}/smc/WEB-INF/classes" />
+		<copy todir="${tomcat.lib.dir}">
+			<fileset dir="${target.lib.dir}">
+			</fileset>
+		</copy>
+		<copy todir="${tomcat.webapps.dir}/smc">
+			<fileset dir="${target.dir}">
+				<exclude name="**/WEB-INF/lib/**" />
+
+				<exclude name="**/WEB-INF/conf/mvc.xml" />
+				<exclude name="**/WEB-INF/conf/logback.xml" />
+				<exclude name="**/WEB-INF/conf/smc.properties" />
+				<exclude name="**/WEB-INF/web.xml" />
+
+			</fileset>
+		</copy>
+	<!--
+		<delete dir="${tomcat.webapps1.dir}/smc/WEB-INF/views" />
+		<delete dir="${tomcat.webapps1.dir}/smc/WEB-INF/classes" />
+		<copy todir="${tomcat.webapps1.dir}/smc">
+			<fileset dir="${target.dir}">
+				<exclude name="**/WEB-INF/lib/**" />
+				<exclude name="**/WEB-INF/conf/mvc.xml" />
+				<exclude name="**/WEB-INF/conf/logback.xml" />
+				<exclude name="**/WEB-INF/conf/smc.properties" />
+				<exclude name="**/WEB-INF/web.xml" />
+			</fileset>
+		</copy>
+	-->
+	</target>
+
+	<target name="archive" depends="build">
+		<war destfile="${target.dir}/framework.war" webxml="${src.main-webapp.dir}/WEB-INF/web.xml">
+			<fileset dir="${src.main-webapp.dir}">
+				<!--
+				<exclude name="**/static/**" />
+				<exclude name="**/WEB-INF/views/**" />
+				-->
+				<exclude name="**/logs/**" />
+				<exclude name="**/WEB-INF/classes/**" />
+			</fileset>
+			<!--
+			<lib dir="thirdparty/libs">
+				<exclude name="jdbc1.jar" />
+			</lib>
+			-->
+			<classes dir="${target.classes.dir}" />
+		</war>
+	</target>
+
+</project>
